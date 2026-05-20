@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>為什麼你想玩卻玩不了？🎮 四道牆理論</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Fredoka+One&display=swap');
+
+  :root {
+    --money: #FF6B35;
+    --time:  #4ECDC4;
+    --mind:  #A855F7;
+    --info:  #F59E0B;
+    --bg:    #0F0E17;
+    --card:  #1A1826;
+    --card2: #221F35;
+    --text:  #FFFFFE;
+    --muted: #A7A9BE;
+    --accent:#FF6B6B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.7;
+  }
+
+  /* ── STARS BACKGROUND ── */
+  body::before {
+    content:'';
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(168,85,247,.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(78,205,196,.10) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, rgba(255,107,53,.08) 0%, transparent 50%);
+    pointer-events:none;
+  }
+
+  .stars {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 40%, rgba(255,255,255,.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 25%, rgba(255,255,255,.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 70%, rgba(255,255,255,.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 10%, rgba(255,255,255,.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 60%, rgba(255,255,255,.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 85%, rgba(255,255,255,.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 75%, rgba(255,255,255,.5) 0%, transparent 100%);
+  }
+
+  /* ── NAV ── */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(15,14,23,.85); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    padding:14px 24px;
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  }
+  nav a {
+    color:var(--muted); text-decoration:none; font-size:.8rem;
+    padding:6px 14px; border-radius:20px; transition:all .2s;
+    border:1px solid transparent;
+  }
+  nav a:hover, nav a.active {
+    color:var(--text); background:rgba(255,255,255,.1);
+    border-color:rgba(255,255,255,.15);
+  }
+  nav .logo {
+    font-family:'Fredoka One',sans-serif; font-size:1.1rem;
+    color:var(--accent); margin-right:auto; letter-spacing:.5px;
+  }
+
+  /* ── WRAPPER ── */
+  .page { position:relative; z-index:1; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height:100vh; display:flex; flex-direction:column;
+    justify-content:center; align-items:center; text-align:center;
+    padding:120px 20px 60px;
+  }
+  .hero-emoji {
+    font-size:5rem; margin-bottom:20px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-12px); }
+  }
+  .hero h1 {
+    font-size:clamp(2rem, 5vw, 3.8rem);
+    font-weight:900; line-height:1.2; margin-bottom:16px;
+    background:linear-gradient(135deg, #fff 30%, #A855F7 70%, #4ECDC4);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .hero .subtitle {
+    font-size:1.15rem; color:var(--muted); max-width:580px;
+    margin:0 auto 40px; line-height:1.8;
+  }
+  .hero .paper-badge {
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+    padding:10px 22px; border-radius:30px; font-size:.82rem; color:var(--muted);
+    margin-bottom:50px;
+  }
+  .scroll-hint {
+    color:var(--muted); font-size:.85rem; animation:bounce 2s infinite;
+  }
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  /* ── SECTIONS ── */
+  section { padding:80px 20px; max-width:960px; margin:0 auto; }
+
+  .section-label {
+    display:inline-block; font-size:.75rem; font-weight:700;
+    letter-spacing:3px; text-transform:uppercase;
+    color:var(--muted); margin-bottom:12px;
+  }
+  h2 {
+    font-size:clamp(1.7rem,4vw,2.5rem); font-weight:900;
+    margin-bottom:16px; line-height:1.25;
+  }
+  .lead {
+    font-size:1.05rem; color:var(--muted); margin-bottom:40px;
+    max-width:700px; line-height:1.85;
+  }
+
+  /* ── PROBLEM SECTION ── */
+  .problem-box {
+    background:var(--card); border:1px solid rgba(255,255,255,.08);
+    border-radius:20px; padding:32px; margin-bottom:24px;
+    display:flex; gap:20px; align-items:flex-start;
+    transition:transform .2s;
+  }
+  .problem-box:hover{ transform:translateY(-3px); }
+  .problem-box .icon{ font-size:2.5rem; flex-shrink:0; }
+  .problem-box h3{ font-size:1.1rem; margin-bottom:8px; }
+  .problem-box p{ color:var(--muted); font-size:.95rem; line-height:1.7; }
+
+  /* ── THEORY CARDS ── */
+  .theory-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px; margin-bottom:20px;
+  }
+  .theory-card {
+    background:var(--card); border-radius:16px; padding:28px;
+    border:1px solid rgba(255,255,255,.07);
+    transition:transform .2s, border-color .2s;
+    position:relative; overflow:hidden;
+  }
+  .theory-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background:var(--accent-color, var(--accent));
+  }
+  .theory-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(255,255,255,.15);
+  }
+  .theory-card .t-icon{ font-size:2rem; margin-bottom:14px; }
+  .theory-card h3{ font-size:1rem; margin-bottom:10px; }
+  .theory-card p{ color:var(--muted); font-size:.88rem; line-height:1.75; }
+  .theory-card .tag {
+    display:inline-block; margin-top:14px; font-size:.72rem;
+    padding:4px 12px; border-radius:20px;
+    background:rgba(255,255,255,.07); color:var(--muted);
+  }
+
+  /* ── 4 WALLS ── */
+  .walls-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:16px;
+  }
+  .wall-card {
+    border-radius:20px; padding:28px 22px; text-align:center;
+    cursor:pointer; transition:all .25s; position:relative;
+    overflow:hidden; border:2px solid transparent;
+  }
+  .wall-card:hover{ transform:scale(1.04); }
+  .wall-card .w-emoji{ font-size:3rem; margin-bottom:14px; display:block; }
+  .wall-card h3{ font-size:1.05rem; font-weight:700; margin-bottom:8px; }
+  .wall-card .w-code{
+    position:absolute; top:14px; right:16px;
+    font-size:.72rem; font-weight:700; opacity:.5; letter-spacing:1px;
+  }
+  .wall-card p{ font-size:.85rem; line-height:1.65; }
+
+  .wall-money{
+    background:linear-gradient(135deg, rgba(255,107,53,.18), rgba(255,107,53,.05));
+    border-color:rgba(255,107,53,.3); color:#FFD4C2;
+  }
+  .wall-money h3{ color:var(--money); }
+  .wall-time{
+    background:linear-gradient(135deg, rgba(78,205,196,.18), rgba(78,205,196,.05));
+    border-color:rgba(78,205,196,.3); color:#C2F5F2;
+  }
+  .wall-time h3{ color:var(--time); }
+  .wall-mind{
+    background:linear-gradient(135deg, rgba(168,85,247,.18), rgba(168,85,247,.05));
+    border-color:rgba(168,85,247,.3); color:#E8D4FF;
+  }
+  .wall-mind h3{ color:var(--mind); }
+  .wall-info{
+    background:linear-gradient(135deg, rgba(245,158,11,.18), rgba(245,158,11,.05));
+    border-color:rgba(245,158,11,.3); color:#FEE8C2;
+  }
+  .wall-info h3{ color:var(--info); }
+
+  /* ── DETAIL PANELS ── */
+  .wall-detail {
+    display:none; background:var(--card); border-radius:16px; padding:32px;
+    margin-top:20px; border:1px solid rgba(255,255,255,.1);
+    animation:slideDown .3s ease;
+  }
+  .wall-detail.show{ display:block; }
+  @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+  .wall-detail h3{ font-size:1.3rem; margin-bottom:16px; }
+  .wall-detail .real-talk {
+    background:rgba(255,255,255,.04); border-left:3px solid;
+    border-radius:0 8px 8px 0; padding:16px 20px;
+    margin:20px 0; font-size:.95rem; color:var(--muted); line-height:1.8;
+  }
+  .wall-detail ul{ padding-left:20px; }
+  .wall-detail ul li{ margin-bottom:8px; color:var(--muted); font-size:.92rem; }
+  .detail-row{ display:flex; gap:16px; flex-wrap:wrap; margin-top:20px; }
+  .detail-chip {
+    background:rgba(255,255,255,.06); border-radius:10px;
+    padding:10px 16px; font-size:.82rem; flex:1; min-width:140px;
+  }
+  .detail-chip strong{ display:block; font-size:.75rem; color:var(--muted); margin-bottom:4px; }
+
+  /* ── EFFECTS ── */
+  .effect-row { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  @media(max-width:640px){ .effect-row{ grid-template-columns:1fr; } }
+  .effect-card {
+    background:var(--card); border-radius:20px; padding:32px;
+    border:1px solid rgba(255,255,255,.08);
+    transition:transform .2s;
+  }
+  .effect-card:hover{ transform:translateY(-4px); }
+  .effect-card .e-icon{ font-size:3rem; margin-bottom:16px; }
+  .effect-card h3{ font-size:1.2rem; margin-bottom:12px; }
+  .effect-card p{ color:var(--muted); font-size:.92rem; line-height:1.8; }
+  .effect-card .analogy {
+    background:rgba(255,255,255,.05); border-radius:10px;
+    padding:14px 18px; margin-top:16px; font-size:.88rem;
+    border:1px dashed rgba(255,255,255,.12);
+  }
+  .effect-card .analogy strong{ color:var(--accent); }
+
+  /* ── CASCADE DIAGRAM ── */
+  .cascade-steps {
+    display:flex; flex-direction:column; gap:0; margin-top:32px;
+  }
+  .c-step {
+    display:flex; gap:16px; align-items:flex-start;
+    padding:20px 0;
+    border-bottom:1px dashed rgba(255,255,255,.08);
+  }
+  .c-step:last-child{ border-bottom:none; }
+  .c-num {
+    width:40px; height:40px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:.9rem;
+    background:linear-gradient(135deg,#A855F7,#4ECDC4);
+  }
+  .c-step h4{ font-size:.95rem; margin-bottom:6px; }
+  .c-step p{ color:var(--muted); font-size:.88rem; line-height:1.7; }
+
+  /* ── PROPOSITIONS ── */
+  .prop-list { display:flex; flex-direction:column; gap:16px; }
+  .prop-item {
+    background:var(--card); border-radius:14px; padding:24px 26px;
+    border:1px solid rgba(255,255,255,.07);
+    display:flex; gap:18px; align-items:flex-start;
+    transition:all .2s;
+  }
+  .prop-item:hover{
+    border-color:rgba(255,255,255,.15);
+    transform:translateX(4px);
+  }
+  .prop-num {
+    width:38px; height:38px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:1rem;
+  }
+  .prop-item h4{ font-size:.95rem; font-weight:700; margin-bottom:6px; }
+  .prop-item p{ color:var(--muted); font-size:.88rem; line-height:1.75; }
+  .prop-item .simple-version{
+    margin-top:10px; background:rgba(255,255,255,.04);
+    border-radius:8px; padding:10px 14px; font-size:.83rem;
+    color:var(--muted);
+  }
+  .prop-item .simple-version strong{ color:var(--text); }
+
+  /* ── QUIZ ── */
+  .quiz-section {
+    background:var(--card); border-radius:24px; padding:40px;
+    border:1px solid rgba(255,255,255,.1); margin-top:20px;
+  }
+  .quiz-q { margin-bottom:28px; }
+  .quiz-q h4{ font-size:1rem; margin-bottom:16px; }
+  .quiz-opts { display:flex; flex-direction:column; gap:10px; }
+  .quiz-opt {
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+    border-radius:10px; padding:14px 20px; cursor:pointer;
+    font-size:.9rem; text-align:left; color:var(--text);
+    transition:all .2s; width:100%;
+  }
+  .quiz-opt:hover{ background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.2); }
+  .quiz-opt.correct{ background:rgba(78,205,196,.15); border-color:var(--time); color:#C2F5F2; }
+  .quiz-opt.wrong{ background:rgba(255,107,107,.1); border-color:var(--accent); }
+  .quiz-opt.reveal-correct{ background:rgba(78,205,196,.1); border-color:rgba(78,205,196,.4); }
+  .feedback {
+    display:none; margin-top:12px; padding:14px 18px;
+    border-radius:10px; font-size:.88rem; line-height:1.7;
+  }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:rgba(78,205,196,.1); color:#A7F3D0; }
+  .feedback.bad{ background:rgba(255,107,107,.1); color:#FFC8C8; }
+
+  /* ── SUMMARY BOX ── */
+  .summary-box {
+    background:linear-gradient(135deg, rgba(168,85,247,.15), rgba(78,205,196,.1));
+    border:1px solid rgba(168,85,247,.3); border-radius:20px;
+    padding:36px; text-align:center; margin-top:40px;
+  }
+  .summary-box h3{ font-size:1.4rem; margin-bottom:16px; }
+  .summary-box p{ color:var(--muted); line-height:1.85; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align:center; padding:40px 20px; color:var(--muted);
+    font-size:.82rem; border-top:1px solid rgba(255,255,255,.06);
+    position:relative; z-index:1;
+  }
+
+  /* ── HIGHLIGHT ── */
+  .hl-money{ color:var(--money); font-weight:700; }
+  .hl-time{ color:var(--time); font-weight:700; }
+  .hl-mind{ color:var(--mind); font-weight:700; }
+  .hl-info{ color:var(--info); font-weight:700; }
+  .hl{ color:var(--accent); font-weight:700; }
+
+  .divider {
+    height:1px; background:linear-gradient(to right, transparent, rgba(255,255,255,.1), transparent);
+    margin:0 auto; max-width:800px;
+  }
+
+  /* RESPONSIVE */
+  @media(max-width:640px){
+    .walls-grid{ grid-template-columns:1fr 1fr; }
+    section{ padding:60px 16px; }
+    .quiz-section{ padding:24px; }
+    .effect-card{ padding:24px; }
+  }
+  @media(max-width:400px){
+    .walls-grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<nav>
+  <span class="logo">🧩 四道牆理論</span>
+  <a href="#intro">介紹</a>
+  <a href="#theories">三大理論</a>
+  <a href="#walls">四道牆</a>
+  <a href="#effects">兩大效應</a>
+  <a href="#props">五個發現</a>
+  <a href="#quiz">小測驗</a>
+</nav>
+
+<div class="page">
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-emoji">🏖️</div>
+  <div class="paper-badge">📄 論文學習導讀 ｜ 賴柳蓉 ｜ 建國科技大學</div>
+  <h1>你想出去玩，<br>但為什麼玩不了？</h1>
+  <p class="subtitle">
+    這篇論文研究了一個很真實的問題：<br>
+    明明很想去旅遊、做運動、看展覽，<br>
+    但就是有種<strong style="color:#FF6B6B">「卡住了」的感覺</strong>。<br>
+    那個「卡」，到底是什麼？
+  </p>
+  <p class="scroll-hint">⬇ 往下滾動來學習</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- INTRO PROBLEM -->
+<section id="intro">
+  <span class="section-label">🔍 這篇論文在說什麼</span>
+  <h2>休閒需求 ≠ 休閒參與</h2>
+  <p class="lead">
+    很多人<strong>想玩</strong>但<strong>沒有去玩</strong>，這中間有一段差距。
+    這篇論文說，那段差距不是一個原因造成的，而是<span class="hl">四道不同的「牆」</span>擋住了你。
+  </p>
+
+  <div class="problem-box">
+    <div class="icon">😩</div>
+    <div>
+      <h3>你有沒有這種經驗？</h3>
+      <p>「我好想去墾丁耶，但是……機票太貴了。」<br>
+         「我想去健身房，但最近工作好忙，根本沒時間。」<br>
+         「我知道週末有免費音樂會，但就是提不起勁去。」<br>
+         「補貼活動我不知道要怎麼報名，算了。」</p>
+    </div>
+  </div>
+  <div class="problem-box">
+    <div class="icon">🎯</div>
+    <div>
+      <h3>這篇論文的核心發現</h3>
+      <p>擋住你去休閒的，是<span class="hl-money">錢</span>、<span class="hl-time">時間</span>、<span class="hl-mind">心理</span>、<span class="hl-info">資訊</span>四種「門檻」。
+      這四道牆不是各自獨立的，它們之間會互相影響——
+      有時候翻過一道牆，其他牆也會自動變矮！</p>
+    </div>
+  </div>
+  <div class="problem-box">
+    <div class="icon">🏛️</div>
+    <div>
+      <h3>這篇論文屬於哪種研究？</h3>
+      <p>這是一篇<strong>「概念性研究」</strong>——
+      就是作者沒有做問卷或實驗，而是把三個不同領域的理論整合在一起，
+      建立一個全新的解釋框架，再提出「假設」等待未來的人去驗證。
+      這就像是先畫好地圖，再等人去探險。</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- THEORIES -->
+<section id="theories">
+  <span class="section-label">📚 三大理論基礎</span>
+  <h2>這篇論文借用了哪些「武器」？</h2>
+  <p class="lead">
+    作者把三個領域的理論組合起來，就像把三種超能力合體，創造出新的解釋框架。
+  </p>
+  <div class="theory-grid">
+
+    <div class="theory-card" style="--accent-color:var(--money)">
+      <div class="t-icon">🧱</div>
+      <h3>休閒限制理論</h3>
+      <p>
+        1987年兩位學者 Crawford & Godbey 提出的。他們說阻礙你去玩的原因分三類：
+        <strong>內心（自己怕怕的）、人際（找不到人陪）、結構（沒錢沒時間）</strong>。<br><br>
+        而且這三層像洋蔥一樣，要一層一層剝開——
+        先克服內心，才會遇到人際問題，最後才碰到錢跟時間的問題。
+      </p>
+      <span class="tag">Crawford & Godbey, 1987</span>
+    </div>
+
+    <div class="theory-card" style="--accent-color:var(--time)">
+      <div class="t-icon">🧠</div>
+      <h3>行為經濟學</h3>
+      <p>
+        這個領域研究人類<strong>「做決定時的心理偏誤」</strong>。裡面有幾個重要概念：<br><br>
+        <strong>展望理論</strong>：你對「損失100元」的難受感，比「賺到100元」的開心感更強。所以你會用「這樣划不划算？」來衡量休閒。<br><br>
+        <strong>心理帳戶</strong>：你腦袋裡有不同的「帳本」，休閒被列在「非必要」帳本，有點錢壓力時最先被砍掉。
+      </p>
+      <span class="tag">Kahneman & Tversky, 1979 ｜ Thaler, 1985</span>
+    </div>
+
+    <div class="theory-card" style="--accent-color:var(--info)">
+      <div class="t-icon">📡</div>
+      <h3>資訊行為理論</h3>
+      <p>
+        研究人們「如何找資訊、處理資訊」的學問。<br><br>
+        重點：就算你有動力、有能力去做一件事，
+        如果<strong>沒有在對的時間收到對的訊息</strong>，行動還是不會發生。<br><br>
+        就像你想去某個活動，但沒有看到廣告，就算有空有錢也不會去報名。
+      </p>
+      <span class="tag">Wilson, 1997 ｜ Fogg, 2009</span>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 4 WALLS -->
+<section id="walls">
+  <span class="section-label">🧱 四維門檻模型</span>
+  <h2>擋住你的四道牆</h2>
+  <p class="lead">
+    點擊每一道牆，看看它在說什麼、為什麼那麼難翻越。
+  </p>
+  <div class="walls-grid">
+    <div class="wall-card wall-money" onclick="toggleWall('money')">
+      <span class="w-emoji">💸</span>
+      <span class="w-code">T1</span>
+      <h3>金錢門檻</h3>
+      <p>太貴了，付不起，或根本覺得「不值得花這個錢」</p>
+    </div>
+    <div class="wall-card wall-time" onclick="toggleWall('time')">
+      <span class="w-emoji">⏰</span>
+      <span class="w-code">T2</span>
+      <h3>時間門檻</h3>
+      <p>就算有空，時間也破碎得不夠完成一次完整的活動</p>
+    </div>
+    <div class="wall-card wall-mind" onclick="toggleWall('mind')">
+      <span class="w-emoji">🌀</span>
+      <span class="w-code">T3</span>
+      <h3>心理門檻</h3>
+      <p>有罪惡感、懶得動、覺得自己不配休息</p>
+    </div>
+    <div class="wall-card wall-info" onclick="toggleWall('info')">
+      <span class="w-emoji">🔎</span>
+      <span class="w-code">T4</span>
+      <h3>資訊門檻</h3>
+      <p>根本不知道有這個活動，或不知道怎麼報名</p>
+    </div>
+  </div>
+
+  <!-- DETAIL PANELS -->
+  <div class="wall-detail" id="detail-money">
+    <h3>💸 金錢門檻（T1）——「這樣花，值不值得？」</h3>
+    <div class="real-talk" style="border-color:var(--money)">
+      <strong style="color:var(--money)">白話版：</strong><br>
+      除了票價、住宿費這種直接的錢，還有你「為了去玩，放棄了多少收入？」
+      對低收入的人，100元可能就是一個決策的關鍵門檻；但對高收入的人，1000元根本不是問題。
+      所以「貴不貴」這件事是<strong>主觀的、因人而異的</strong>。
+    </div>
+    <ul>
+      <li>直接費用：票券、住宿、交通、餐費</li>
+      <li>間接費用：裝備（運動鞋、泳衣）、請假少的薪水</li>
+      <li>心理帳戶影響：休閒被歸類在「非必要支出」，有壓力時最先砍掉</li>
+      <li>展望理論影響：你特別怕「花了錢卻不好玩」這種損失感</li>
+    </ul>
+    <div class="detail-row">
+      <div class="detail-chip"><strong>誰最受影響</strong>低收入族群、工讀生、打工族</div>
+      <div class="detail-chip"><strong>關鍵問題</strong>「這樣花，划得來嗎？」</div>
+      <div class="detail-chip"><strong>政策對策</strong>補貼、折扣券、低價替代方案</div>
+    </div>
+  </div>
+
+  <div class="wall-detail" id="detail-time">
+    <h3>⏰ 時間門檻（T2）——「有空，但不夠用」</h3>
+    <div class="real-talk" style="border-color:var(--time)">
+      <strong style="color:var(--time)">白話版：</strong><br>
+      不是完全沒時間，而是你的空閒時間像「零碎的拼圖」——
+      下班有1小時，但騎車+排隊就要40分鐘，根本玩不了一場完整的球。
+      最慘的是<strong>計時工作者</strong>（如便利商店工讀生、外送員）：
+      請假就等於少賺錢，時間門檻是雙倍懲罰。
+    </div>
+    <ul>
+      <li>不只是「有沒有時間」，而是時間是否「連續」且「足夠」</li>
+      <li>受薪族可以用特休，但計時工作者請假就少一天的錢</li>
+      <li>家庭責任也是時間殺手（接小孩、照顧家人）</li>
+    </ul>
+    <div class="detail-row">
+      <div class="detail-chip"><strong>誰最受影響</strong>打工族、外送員、接送小孩的父母</div>
+      <div class="detail-chip"><strong>關鍵問題</strong>「湊得出一整段空閒嗎？」</div>
+      <div class="detail-chip"><strong>政策對策</strong>短時段活動設計、彈性場次</div>
+    </div>
+  </div>
+
+  <div class="wall-detail" id="detail-mind">
+    <h3>🌀 心理門檻（T3）——「我不該去玩」</h3>
+    <div class="real-talk" style="border-color:var(--mind)">
+      <strong style="color:var(--mind)">白話版：</strong><br>
+      這是最難被「政策」直接解決的一道牆。<br>
+      你可能有錢、有時間、也知道有活動，但你就是<strong>提不起勁</strong>，
+      甚至覺得「我都這麼累了，休息有什麼用？」這種狀態叫做「習得性無助」——
+      壓力太久，大腦開始覺得「算了，做什麼都沒用」。
+    </div>
+    <ul>
+      <li><strong>罪惡感</strong>：「我應該工作/唸書，哪有資格玩？」</li>
+      <li><strong>焦慮</strong>：「去陌生地方、跟不熟的人互動，好可怕」</li>
+      <li><strong>習得性無助</strong>：長期高壓後，連「出去走走」都覺得沒意義</li>
+      <li><strong>慣性惰性</strong>：「就算今天有空，我也只想躺著滑手機」</li>
+    </ul>
+    <div class="detail-row">
+      <div class="detail-chip"><strong>特性</strong>隨壓力狀態變動（發薪日前後不一樣）</div>
+      <div class="detail-chip"><strong>關鍵問題</strong>「我有資格去享受嗎？」</div>
+      <div class="detail-chip"><strong>改善方式</strong>其他三道牆降低後，這道牆也會跟著變矮</div>
+    </div>
+  </div>
+
+  <div class="wall-detail" id="detail-info">
+    <h3>🔎 資訊門檻（T4）——「我不知道有這個」</h3>
+    <div class="real-talk" style="border-color:var(--info)">
+      <strong style="color:var(--info)">白話版：</strong><br>
+      就算政府給了很大的補貼，有人因為<strong>沒看到資訊</strong>就根本不知道。
+      但更關鍵的不只是「有沒有看到廣告」，而是<strong>在什麼時間點看到</strong>——
+      週五下午3點，你還在趕報告，這時收到旅遊廣告沒用；
+      但週五晚上10點，你剛交完報告，這時推一張折扣券，你可能馬上訂了。
+    </div>
+    <ul>
+      <li><strong>覆蓋廣度</strong>：資訊有沒有被看到（這個相對次要）</li>
+      <li><strong>觸達時機</strong>：在你的心理門檻最低的時刻出現（這個才是關鍵！）</li>
+      <li><strong>個人化精準度</strong>：你想去的類型、你的預算、你的空閒時間</li>
+    </ul>
+    <div class="detail-row">
+      <div class="detail-chip"><strong>誰最受影響</strong>資訊不靈通的高齡者、偏鄉居民</div>
+      <div class="detail-chip"><strong>關鍵問題</strong>「在對的時間，推到對的人嗎？」</div>
+      <div class="detail-chip"><strong>政策對策</strong>主動觸達機制、精準時機推播</div>
+    </div>
+  </div>
+
+</section>
+
+<div class="divider"></div>
+
+<!-- EFFECTS -->
+<section id="effects">
+  <span class="section-label">⚡ 兩大互動機制</span>
+  <h2>四道牆會互相影響！</h2>
+  <p class="lead">
+    這四道牆不是孤立的，它們之間有兩種「連動方式」，讓整件事變得複雜又有趣。
+  </p>
+
+  <div class="effect-row">
+    <!-- COMPENSATION -->
+    <div class="effect-card">
+      <div class="e-icon">🔄</div>
+      <h3>補償效應<br><small style="font-size:.8rem;color:var(--muted)">Compensation Effect</small></h3>
+      <p>
+        翻不過某道牆？沒關係，<strong>你會繞道走另一條路</strong>。
+        你不會完全放棄「休閒需求」，而是會找替代品滿足它。
+      </p>
+      <div class="analogy">
+        <strong>🍕 類比：</strong><br>
+        想吃高級義大利餐廳（貴），改去吃平價披薩。<br>
+        想去日本旅遊（沒時間），改去九份一日遊。<br>
+        沒錢辦健身房，改去公園慢跑。<br>
+        <br>
+        需求沒消失，只是<strong>換個形式</strong>了！
+      </div>
+      <p style="margin-top:16px;color:var(--muted);font-size:.88rem;">
+        所以如果統計數字顯示「休閒參與率下降」，
+        不代表大家不想玩了，可能只是<strong>換了玩法</strong>。
+      </p>
+    </div>
+
+    <!-- CASCADE -->
+    <div class="effect-card">
+      <div class="e-icon">🌊</div>
+      <h3>瀑布效應<br><small style="font-size:.8rem;color:var(--muted)">Cascade Effect</small></h3>
+      <p>
+        某一道牆被「大幅降低」之後，其他的牆也會像骨牌一樣<strong>跟著倒下</strong>！
+      </p>
+      <div class="analogy">
+        <strong>💡 類比：</strong><br>
+        政府發了旅遊補貼（金錢門檻↓）<br>
+        → 你覺得「不用就虧了！」（心理門檻↓）<br>
+        → 你開始主動排行程、請特休（時間門檻↓）<br>
+        → 你主動去查活動資訊（資訊門檻↓）<br>
+        → <strong>成功出發！</strong>
+      </div>
+      <p style="margin-top:16px;color:var(--muted);font-size:.88rem;">
+        這就是為什麼好的補貼政策效果可以<strong>遠大於補貼金額本身</strong>——
+        因為它啟動了一連串的連鎖反應！
+      </p>
+    </div>
+  </div>
+
+  <!-- CASCADE DETAIL -->
+  <div style="background:var(--card);border-radius:20px;padding:32px;margin-top:24px;border:1px solid rgba(255,255,255,.08)">
+    <h3 style="font-size:1.15rem;margin-bottom:8px">🌊 瀑布效應的四個階段（白話版）</h3>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:24px">以「政府發旅遊補貼」為例：</p>
+    <div class="cascade-steps">
+      <div class="c-step">
+        <div class="c-num">1</div>
+        <div>
+          <h4>💸 金錢門檻下降</h4>
+          <p>補貼讓旅遊費用降低，超過你的「啟動門檻」——也就是降得夠多，讓你覺得「好像可以考慮看看」。</p>
+        </div>
+      </div>
+      <div class="c-step">
+        <div class="c-num">2</div>
+        <div>
+          <h4>🌀 心理門檻自動下降</h4>
+          <p>補貼讓你覺得「不用就虧了！」（損失趨避）。你的罪惡感消失了，因為「去旅遊是正確的事，不去才是損失」。</p>
+        </div>
+      </div>
+      <div class="c-step">
+        <div class="c-num">3</div>
+        <div>
+          <h4>⏰ 時間門檻自動下降</h4>
+          <p>你開始主動去安排時間、申請特休。原本覺得「沒辦法」的時間，突然「安排出來了」。動機夠強，時間就有了。</p>
+        </div>
+      </div>
+      <div class="c-step">
+        <div class="c-num">4</div>
+        <div>
+          <h4>🔎 資訊門檻自動下降</h4>
+          <p>你開始主動搜尋怎麼用補貼、去哪裡玩。原本懶得查的，現在主動去找了。四道牆同時最低，成功出發！</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROPOSITIONS -->
+<section id="props">
+  <span class="section-label">💡 五項研究命題</span>
+  <h2>作者提出的五個「猜測」等待驗證</h2>
+  <p class="lead">
+    這篇論文是概念性研究，所以作者提出五個命題（就像假設），
+    讓未來的研究者去用問卷、實驗來證明或推翻它們。
+  </p>
+  <div class="prop-list">
+
+    <div class="prop-item">
+      <div class="prop-num" style="background:rgba(255,107,53,.2);color:var(--money)">P1</div>
+      <div>
+        <h4>💸 錢越少，玩越少——但窮人受影響更大</h4>
+        <p>金錢門檻越高，參與休閒的次數越少。特別是在低收入族群中，這個效果更明顯。</p>
+        <div class="simple-version">
+          <strong>😎 超白話：</strong> 窮的時候玩更少，這不意外——但「窮的人」比「有點錢的人」受影響更多。
+        </div>
+      </div>
+    </div>
+
+    <div class="prop-item">
+      <div class="prop-num" style="background:rgba(78,205,196,.2);color:var(--time)">P2</div>
+      <div>
+        <h4>⏰ 打工族的時間壓力遠比上班族更嚴苛</h4>
+        <p>計時工作者（工讀生、外送員）面對的時間門檻，顯著高於有固定薪資的上班族。</p>
+        <div class="simple-version">
+          <strong>😎 超白話：</strong> 工讀生請假就少賺錢，上班族用特休就沒損失——這不公平，但論文想確認這個差距有多大。
+        </div>
+      </div>
+    </div>
+
+    <div class="prop-item">
+      <div class="prop-num" style="background:rgba(168,85,247,.2);color:var(--mind)">P3</div>
+      <div>
+        <h4>🌀 壓力太大，反而更不想去玩</h4>
+        <p>你可能以為壓力越大，越需要休閒、所以越想去。但心理門檻的規律剛好相反：壓力到達臨界點後，反而會「習得性無助」，連休閒都提不起勁。</p>
+        <div class="simple-version">
+          <strong>😎 超白話：</strong> 壓力累積太多，大腦會「當機」——你知道應該去放鬆，但就是無法動。這是心理機制，不是懶。
+        </div>
+      </div>
+    </div>
+
+    <div class="prop-item">
+      <div class="prop-num" style="background:rgba(245,158,11,.2);color:var(--info)">P4</div>
+      <div>
+        <h4>🔎 廣告曝光量不重要，出現的「時機點」才重要</h4>
+        <p>資訊的行為轉化效果，取決於它在「你的心理門檻最低的時候」出現，而非廣告看了多少次。</p>
+        <div class="simple-version">
+          <strong>😎 超白話：</strong> 週五晚上剛交完報告，推一張週末折扣，比你在週三上班時收到10張廣告更有效。
+        </div>
+      </div>
+    </div>
+
+    <div class="prop-item">
+      <div class="prop-num" style="background:rgba(255,107,107,.2);color:var(--accent)">P5</div>
+      <div>
+        <h4>🌊 補貼效果比「折扣價值」本身更大</h4>
+        <p>補貼政策的效果，不只來自「省了多少錢」，還會透過心理啟動、時間安排、資訊搜尋等連鎖路徑產生乘數效果，讓整體參與率提升超出預期。</p>
+        <div class="simple-version">
+          <strong>😎 超白話：</strong> 補貼500元，帶來的效果可能遠不只省了500元而已——它會觸發瀑布效應，讓人原本不會去也變成「去了」。
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- QUIZ -->
+<section id="quiz">
+  <span class="section-label">🎮 學習小測驗</span>
+  <h2>你學會了嗎？來考考看！</h2>
+  <p class="lead">每題只有一個最好的答案，試試看吧！</p>
+
+  <div class="quiz-section">
+
+    <!-- Q1 -->
+    <div class="quiz-q" id="q1">
+      <h4>Q1 ｜ 一個外送員想去爬山，但他不敢請假因為請假就少賺錢。這是哪種門檻？</h4>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answer('q1',this,'wrong')">心理門檻——他太懶了</button>
+        <button class="quiz-opt" onclick="answer('q1',this,'correct')">時間門檻——計時工作者的時間代價更高</button>
+        <button class="quiz-opt" onclick="answer('q1',this,'wrong')">資訊門檻——他不知道山在哪裡</button>
+        <button class="quiz-opt" onclick="answer('q1',this,'wrong')">金錢門檻——爬山費用太貴</button>
+      </div>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-q" id="q2">
+      <h4>Q2 ｜ 「政府發振興券之後，大家開始主動查活動資訊、安排假期」，這是哪種效應？</h4>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answer('q2',this,'wrong')">補償效應——找替代方案</button>
+        <button class="quiz-opt" onclick="answer('q2',this,'correct')">瀑布效應——一個門檻降低後帶動其他門檻同步下降</button>
+        <button class="quiz-opt" onclick="answer('q2',this,'wrong')">限制協商——調整期望值</button>
+        <button class="quiz-opt" onclick="answer('q2',this,'wrong')">心理帳戶——把錢分到不同帳本</button>
+      </div>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-q" id="q3">
+      <h4>Q3 ｜ 根據「展望理論」，消費者對休閒的哪種心理最強？</h4>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answer('q3',this,'wrong')">「賺到便宜」的開心感</button>
+        <button class="quiz-opt" onclick="answer('q3',this,'wrong')">「去了很開心」的滿足感</button>
+        <button class="quiz-opt" onclick="answer('q3',this,'correct')">「花了錢卻不好玩」的損失恐懼感</button>
+        <button class="quiz-opt" onclick="answer('q3',this,'wrong')">「有去就好」的隨意感</button>
+      </div>
+      <div class="feedback" id="fb-q3"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-q" id="q4">
+      <h4>Q4 ｜ 一個人有錢有時間，但因為長期高壓工作，對所有休閒活動都「提不起勁」。這叫做？</h4>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answer('q4',this,'wrong')">金錢門檻過高</button>
+        <button class="quiz-opt" onclick="answer('q4',this,'wrong')">資訊門檻過高</button>
+        <button class="quiz-opt" onclick="answer('q4',this,'wrong')">人際限制（找不到人陪）</button>
+        <button class="quiz-opt" onclick="answer('q4',this,'correct')">心理門檻的「習得性無助」</button>
+      </div>
+      <div class="feedback" id="fb-q4"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-q" id="q5">
+      <h4>Q5 ｜ 這篇論文屬於哪種研究類型？</h4>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="answer('q5',this,'wrong')">量化研究——用統計分析大量問卷資料</button>
+        <button class="quiz-opt" onclick="answer('q5',this,'wrong')">質性研究——深度訪談受訪者</button>
+        <button class="quiz-opt" onclick="answer('q5',this,'correct')">概念性研究——整合理論、建立框架、提出命題</button>
+        <button class="quiz-opt" onclick="answer('q5',this,'wrong')">實驗研究——在實驗室操控變數</button>
+      </div>
+      <div class="feedback" id="fb-q5"></div>
+    </div>
+
+  </div>
+
+  <div class="summary-box" style="margin-top:48px">
+    <h3>🎓 這篇論文的超精簡版結論</h3>
+    <p>
+      <span class="hl">你想去玩卻沒去玩</span>，不是你的問題，是有<span class="hl-money">四道牆</span>擋著你：
+      <span class="hl-money">錢</span>、<span class="hl-time">時間</span>、<span class="hl-mind">心理</span>、<span class="hl-info">資訊</span>。<br><br>
+      這四道牆會互動：翻不過一道牆，你可能<strong>找旁邊的門</strong>（補償效應）；
+      有人幫你拆一道牆，其他牆可能<strong>跟著倒掉</strong>（瀑布效應）。<br><br>
+      所以設計休閒補貼政策時，不能只想「給錢就好」，
+      要同時考慮四道牆的整合介入，效果才會是真正的<strong>1+1+1+1＞4</strong>。
+    </p>
+  </div>
+</section>
+
+<footer>
+  <p>📄 論文原著：賴柳蓉｜建國科技大學經營管理系</p>
+  <p style="margin-top:8px">《休閒參與滯礙因素之整合性框架建構：邁向健康促進的四維門檻模型》</p>
+  <p style="margin-top:8px">本學習網站由 Claude AI 協助製作，僅供學術學習用途</p>
+</footer>
+
+</div><!-- .page -->
+
+<script>
+// WALL TOGGLE
+const openWall = { money:false, time:false, mind:false, info:false };
+function toggleWall(type) {
+  const panel = document.getElementById('detail-'+type);
+  const isOpen = openWall[type];
+  // close all
+  Object.keys(openWall).forEach(k => {
+    openWall[k] = false;
+    const p = document.getElementById('detail-'+k);
+    if(p) p.classList.remove('show');
+  });
+  if(!isOpen) {
+    openWall[type] = true;
+    panel.classList.add('show');
+    panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+}
+
+// QUIZ
+const answers = {
+  q1: { msg: '✅ 正確！計時工作者的時間門檻最嚴苛——請假就等於直接損失收入，所以「時間」的代價比受薪族大得多。' },
+  q2: { msg: '✅ 正確！這就是瀑布效應——一個門檻（金錢）降低後，心理門檻、時間門檻、資訊門檻跟著連鎖下降，最終促成參與行為。' },
+  q3: { msg: '✅ 正確！根據展望理論（Kahneman & Tversky, 1979），人對「損失」的敏感度遠大於「獲益」。花了錢沒好玩的恐懼，讓人在消費前特別猶豫。' },
+  q4: { msg: '✅ 正確！這就是心理門檻中的「習得性無助」——長期壓力讓大腦學會放棄，即使客觀條件允許，主觀動力也會崩塌。' },
+  q5: { msg: '✅ 正確！概念性研究不做問卷也不做實驗，而是透過整合現有理論、邏輯推演來建立新框架，並提出命題等待後人驗證。' }
+};
+const wrongs = {
+  q1: '❌ 再想想！外送員不是不想去，而是「請假就少賺錢」這個結構問題，屬於時間成本過高的問題。',
+  q2: '❌ 再想想！補償效應是找替代方案（例如用小旅行取代出國）。題目說的是「一個補貼讓其他行為全部跟著改變」——這是瀑布效應。',
+  q3: '❌ 再想想！展望理論的重點是「損失比獲益更敏感」。所以消費者最怕的是花了錢卻不值得的損失感。',
+  q4: '❌ 再想想！有錢有時間，問題不在這兩個維度。長期高壓讓人對所有事情提不起勁，這是心理門檻的特殊現象——習得性無助。',
+  q5: '❌ 再想想！這篇論文沒有收集實際資料，而是整合三個理論領域的文獻，推演出新框架，再提出五個待驗證的命題。'
+};
+const done = {};
+
+function answer(qid, btn, result) {
+  if(done[qid]) return;
+  done[qid] = true;
+  const opts = btn.closest('.quiz-opts').querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.disabled = true);
+  const fb = document.getElementById('fb-'+qid);
+  if(result === 'correct') {
+    btn.classList.add('correct');
+    fb.textContent = answers[qid].msg;
+    fb.className = 'feedback show good';
+  } else {
+    btn.classList.add('wrong');
+    // highlight correct
+    opts.forEach(o => {
+      if(o.textContent.includes(getCorrOpt(qid))) o.classList.add('reveal-correct');
+    });
+    fb.textContent = wrongs[qid];
+    fb.className = 'feedback show bad';
+  }
+}
+
+function getCorrOpt(qid) {
+  const map = {
+    q1:'時間門檻', q2:'瀑布效應', q3:'損失恐懼', q4:'習得性無助', q5:'概念性研究'
+  };
+  return map[qid] || '';
+}
+
+// NAV ACTIVE
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if(window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#'+current);
+  });
+}, { passive: true });
+</script>
+</body>
+</html>
